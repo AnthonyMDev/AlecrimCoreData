@@ -13,7 +13,7 @@ import Foundation
 extension CoreDataQueryable {
 
     public func toArrayController() -> NSArrayController {
-        let fetchRequest = self.toFetchRequest()
+        let fetchRequest: NSFetchRequest<Item> = self.toFetchRequest()
         
         let arrayController = NSArrayController(content: nil)
         

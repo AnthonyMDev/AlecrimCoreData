@@ -13,14 +13,14 @@ import UIKit
     
 extension FetchRequestController {
 
-    public func bind<CellType: UITableViewCell>(to tableView: UITableView, rowAnimation: UITableViewRowAnimation = .Fade, sectionOffset: Int = 0, cellConfigurationHandler: ((CellType, NSIndexPath) -> Void)? = nil) -> Self {
+    public func bind<CellType: UITableViewCell>(to tableView: UITableView, rowAnimation: UITableViewRowAnimation = .fade, sectionOffset: Int = 0, cellConfigurationHandler: ((CellType, IndexPath) -> Void)? = nil) -> Self {
         let insertedSectionIndexes = NSMutableIndexSet()
         let deletedSectionIndexes = NSMutableIndexSet()
         let updatedSectionIndexes = NSMutableIndexSet()
         
-        var insertedItemIndexPaths = [NSIndexPath]()
-        var deletedItemIndexPaths = [NSIndexPath]()
-        var updatedItemIndexPaths = [NSIndexPath]()
+        var insertedItemIndexPaths = [IndexPath]()
+        var deletedItemIndexPaths = [IndexPath]()
+        var updatedItemIndexPaths = [IndexPath]()
         
         var reloadData = false
         
@@ -35,9 +35,9 @@ extension FetchRequestController {
                     deletedSectionIndexes.removeAllIndexes()
                     updatedSectionIndexes.removeAllIndexes()
                     
-                    insertedItemIndexPaths.removeAll(keepCapacity: false)
-                    deletedItemIndexPaths.removeAll(keepCapacity: false)
-                    updatedItemIndexPaths.removeAll(keepCapacity: false)
+                    insertedItemIndexPaths.removeAll(keepingCapacity: false)
+                    deletedItemIndexPaths.removeAll(keepingCapacity: false)
+                    updatedItemIndexPaths.removeAll(keepingCapacity: false)
                     
                     //
                     tableView.beginUpdates()
@@ -45,59 +45,59 @@ extension FetchRequestController {
             }
             .didInsertSection { sectionInfo, sectionIndex in
                 if !reloadData {
-                    insertedSectionIndexes.addIndex(sectionIndex + sectionOffset)
+                    insertedSectionIndexes.add(sectionIndex + sectionOffset)
                 }
             }
             .didDeleteSection { sectionInfo, sectionIndex in
                 if !reloadData {
-                    deletedSectionIndexes.addIndex(sectionIndex + sectionOffset)
-                    deletedItemIndexPaths = deletedItemIndexPaths.filter { $0.section != sectionIndex}
-                    updatedItemIndexPaths = updatedItemIndexPaths.filter { $0.section != sectionIndex}
+                    deletedSectionIndexes.add(sectionIndex + sectionOffset)
+                    deletedItemIndexPaths = deletedItemIndexPaths.filter { ($0 as NSIndexPath).section != sectionIndex}
+                    updatedItemIndexPaths = updatedItemIndexPaths.filter { ($0 as NSIndexPath).section != sectionIndex}
                 }
             }
             .didInsertEntity { entity, newIndexPath in
                 if !reloadData {
-                    let newIndexPath = sectionOffset > 0 ? NSIndexPath(forRow: newIndexPath.item, inSection: newIndexPath.section + sectionOffset) : newIndexPath
+                    let newIndexPath = sectionOffset > 0 ? IndexPath(row: (newIndexPath as NSIndexPath).item, section: (newIndexPath as NSIndexPath).section + sectionOffset) : newIndexPath as IndexPath
 
-                    if !insertedSectionIndexes.containsIndex(newIndexPath.section) {
+                    if !insertedSectionIndexes.contains((newIndexPath as NSIndexPath).section) {
                         insertedItemIndexPaths.append(newIndexPath)
                     }
                 }
             }
             .didDeleteEntity { entity, indexPath in
                 if !reloadData {
-                    let indexPath = sectionOffset > 0 ? NSIndexPath(forRow: indexPath.item, inSection: indexPath.section + sectionOffset) : indexPath
+                    let indexPath = sectionOffset > 0 ? IndexPath(row: (indexPath as NSIndexPath).item, section: (indexPath as NSIndexPath).section + sectionOffset) : indexPath as IndexPath
 
-                    if !deletedSectionIndexes.containsIndex(indexPath.section) {
+                    if !deletedSectionIndexes.contains((indexPath as NSIndexPath).section) {
                         deletedItemIndexPaths.append(indexPath)
                     }
                 }
             }
             .didUpdateEntity { entity, indexPath in
                 if !reloadData {
-                    let indexPath = sectionOffset > 0 ? NSIndexPath(forRow: indexPath.item, inSection: indexPath.section + sectionOffset) : indexPath
+                    let indexPath = sectionOffset > 0 ? IndexPath(row: (indexPath as NSIndexPath).item, section: (indexPath as NSIndexPath).section + sectionOffset) : indexPath as IndexPath
 
-                    if !deletedSectionIndexes.containsIndex(indexPath.section) && deletedItemIndexPaths.indexOf(indexPath) == nil && updatedItemIndexPaths.indexOf(indexPath) == nil {
+                    if !deletedSectionIndexes.contains((indexPath as NSIndexPath).section) && deletedItemIndexPaths.index(of: indexPath) == nil && updatedItemIndexPaths.index(of: indexPath) == nil {
                         updatedItemIndexPaths.append(indexPath)
                     }
                 }
             }
             .didMoveEntity { entity, indexPath, newIndexPath in
                 if !reloadData {
-                    let newIndexPath = sectionOffset > 0 ? NSIndexPath(forRow: newIndexPath.item, inSection: newIndexPath.section + sectionOffset) : newIndexPath
-                    let indexPath = sectionOffset > 0 ? NSIndexPath(forRow: indexPath.item, inSection: indexPath.section + sectionOffset) : indexPath
+                    let newIndexPath = sectionOffset > 0 ? IndexPath(row: (newIndexPath as NSIndexPath).item, section: (newIndexPath as NSIndexPath).section + sectionOffset) : newIndexPath as IndexPath
+                    let indexPath = sectionOffset > 0 ? IndexPath(row: (indexPath as NSIndexPath).item, section: (indexPath as NSIndexPath).section + sectionOffset) : indexPath as IndexPath
 
                     if newIndexPath == indexPath {
-                        if !deletedSectionIndexes.containsIndex(indexPath.section) && deletedItemIndexPaths.indexOf(indexPath) == nil && updatedItemIndexPaths.indexOf(indexPath) == nil {
+                        if !deletedSectionIndexes.contains((indexPath as NSIndexPath).section) && deletedItemIndexPaths.index(of: indexPath) == nil && updatedItemIndexPaths.index(of: indexPath) == nil {
                             updatedItemIndexPaths.append(indexPath)
                         }
                     }
                     else {
-                        if !deletedSectionIndexes.containsIndex(indexPath.section) {
+                        if !deletedSectionIndexes.contains((indexPath as NSIndexPath).section) {
                             deletedItemIndexPaths.append(indexPath)
                         }
                         
-                        if !insertedSectionIndexes.containsIndex(newIndexPath.section) {
+                        if !insertedSectionIndexes.contains((newIndexPath as NSIndexPath).section) {
                             insertedItemIndexPaths.append(newIndexPath)
                         }
                     }
@@ -109,34 +109,34 @@ extension FetchRequestController {
                 }
                 else {
                     if deletedSectionIndexes.count > 0 {
-                        tableView.deleteSections(deletedSectionIndexes, withRowAnimation: rowAnimation)
+                        tableView.deleteSections(deletedSectionIndexes as IndexSet, with: rowAnimation)
                     }
                     
                     if insertedSectionIndexes.count > 0 {
-                        tableView.insertSections(insertedSectionIndexes, withRowAnimation: rowAnimation)
+                        tableView.insertSections(insertedSectionIndexes as IndexSet, with: rowAnimation)
                     }
                     
                     if updatedSectionIndexes.count > 0 {
-                        tableView.reloadSections(updatedSectionIndexes, withRowAnimation: rowAnimation)
+                        tableView.reloadSections(updatedSectionIndexes as IndexSet, with: rowAnimation)
                     }
                     
                     if deletedItemIndexPaths.count > 0 {
-                        tableView.deleteRowsAtIndexPaths(deletedItemIndexPaths, withRowAnimation: rowAnimation)
+                        tableView.deleteRows(at: deletedItemIndexPaths, with: rowAnimation)
                     }
                     
                     if insertedItemIndexPaths.count > 0 {
-                        tableView.insertRowsAtIndexPaths(insertedItemIndexPaths, withRowAnimation: rowAnimation)
+                        tableView.insertRows(at: insertedItemIndexPaths, with: rowAnimation)
                     }
                     
                     if updatedItemIndexPaths.count > 0 && cellConfigurationHandler == nil {
-                        tableView.reloadRowsAtIndexPaths(updatedItemIndexPaths, withRowAnimation: rowAnimation)
+                        tableView.reloadRows(at: updatedItemIndexPaths, with: rowAnimation)
                     }
                     
                     tableView.endUpdates()
                     
                     if let cellConfigurationHandler = cellConfigurationHandler {
                         for updatedItemIndexPath in updatedItemIndexPaths {
-                            if let cell = tableView.cellForRowAtIndexPath(updatedItemIndexPath) as? CellType {
+                            if let cell = tableView.cellForRow(at: updatedItemIndexPath) as? CellType {
                                 cellConfigurationHandler(cell, updatedItemIndexPath)
                             }
                         }
@@ -148,9 +148,9 @@ extension FetchRequestController {
                 deletedSectionIndexes.removeAllIndexes()
                 updatedSectionIndexes.removeAllIndexes()
                 
-                insertedItemIndexPaths.removeAll(keepCapacity: false)
-                deletedItemIndexPaths.removeAll(keepCapacity: false)
-                updatedItemIndexPaths.removeAll(keepCapacity: false)
+                insertedItemIndexPaths.removeAll(keepingCapacity: false)
+                deletedItemIndexPaths.removeAll(keepingCapacity: false)
+                updatedItemIndexPaths.removeAll(keepingCapacity: false)
                 
                 reloadData = false
         }

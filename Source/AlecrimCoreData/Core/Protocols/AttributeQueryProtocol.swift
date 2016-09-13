@@ -37,10 +37,9 @@ extension AttributeQueryProtocol {
         do {
             var results: [Self.Item] = []
             
-            let fetchRequestResult = try self.dataContext.executeFetchRequest(self.toFetchRequest())
-            guard let dicts = fetchRequestResult as? [NSDictionary] else { throw AlecrimCoreDataError.unexpectedValue(fetchRequestResult) }
+            let fetchRequestResult: [NSDictionary] = try self.dataContext.fetch(self.toFetchRequest())
             
-            try dicts.forEach {
+            try fetchRequestResult.forEach {
                 guard $0.count == 1, let value = $0.allValues.first as? Self.Item else {
                     throw AlecrimCoreDataError.unexpectedValue($0)
                 }
@@ -61,10 +60,7 @@ extension AttributeQueryProtocol where Self.Item: NSDictionary {
     
     public func toArray() -> [NSDictionary] {
         do {
-            let fetchRequestResult = try self.dataContext.executeFetchRequest(self.toFetchRequest())
-            guard let dicts = fetchRequestResult as? [NSDictionary] else { throw AlecrimCoreDataError.unexpectedValue(fetchRequestResult) }
-            
-            return dicts
+            return try self.dataContext.fetch(self.toFetchRequest())
         }
         catch let error {
             AlecrimCoreDataError.handleError(error)
@@ -78,8 +74,8 @@ extension AttributeQueryProtocol where Self.Item: NSDictionary {
 
 extension AttributeQueryProtocol {
     
-    public func toFetchRequest() -> NSFetchRequest {
-        let fetchRequest = NSFetchRequest()
+    public func toFetchRequest<ResultType: NSFetchRequestResult>() -> NSFetchRequest<ResultType> {
+        let fetchRequest = NSFetchRequest<ResultType>()
         
         fetchRequest.entity = self.entityDescription
         
@@ -91,7 +87,7 @@ extension AttributeQueryProtocol {
         fetchRequest.sortDescriptors = self.sortDescriptors
         
         //
-        fetchRequest.resultType = .DictionaryResultType
+        fetchRequest.resultType = .dictionaryResultType
         fetchRequest.returnsDistinctResults = self.returnsDistinctResults
         fetchRequest.propertiesToFetch = self.propertiesToFetch
         

@@ -37,11 +37,11 @@ public struct Table<T: NSManagedObject>: TableProtocol {
 
 extension NSPersistentStoreCoordinator {
     
-    private struct AssociatedKeys {
+    fileprivate struct AssociatedKeys {
         static var CachedEntityDescriptions = "Alecrim_cachedEntityDescriptions"
     }
     
-    private var cachedEntityDescriptions: [String : NSEntityDescription] {
+    fileprivate var cachedEntityDescriptions: [String : NSEntityDescription] {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.CachedEntityDescriptions)
                 as? [String : NSEntityDescription] ?? [:]
@@ -56,10 +56,10 @@ extension NSPersistentStoreCoordinator {
         }
     }
     
-    @warn_unused_result
-    private func cachedEntityDescription(for dataContext: NSManagedObjectContext, managedObjectType: NSManagedObject.Type) -> NSEntityDescription {
-        let dataContextClassName = String(dataContext.dynamicType)
-        let managedObjectClassName = String(managedObjectType)
+    
+    fileprivate func cachedEntityDescription(for dataContext: NSManagedObjectContext, managedObjectType: NSManagedObject.Type) -> NSEntityDescription {
+        let dataContextClassName = String(describing: type(of: dataContext))
+        let managedObjectClassName = String(describing: managedObjectType)
         let cacheKey = "\(dataContextClassName)|\(managedObjectClassName)"
         
         let entityDescription: NSEntityDescription
@@ -72,7 +72,7 @@ extension NSPersistentStoreCoordinator {
             entityDescription =
                 managedObjectModel.entities
                     .filter({
-                        $0.managedObjectClassName.componentsSeparatedByString(".").last! == managedObjectClassName
+                        $0.managedObjectClassName.components(separatedBy: ".").last! == managedObjectClassName
                     })
                     .first!
             

@@ -20,7 +20,7 @@ public protocol GenericQueryable: Queryable {
 
 extension GenericQueryable {
     
-    public func orderBy<A: AttributeProtocol, V where A.ValueType == V>(ascending ascending: Bool = true, @noescape orderingClosure: (Self.Item.Type) -> A) -> Self {
+    public func orderBy<A: AttributeProtocol, V>(ascending: Bool = true, orderingClosure: (Self.Item.Type) -> A) -> Self where A.ValueType == V {
         return self.sort(using: orderingClosure(Self.Item.self), ascending: ascending)
     }
     
@@ -30,7 +30,7 @@ extension GenericQueryable {
 
 extension GenericQueryable {
     
-    public func filter(@noescape predicateClosure: (Self.Item.Type) -> NSPredicate) -> Self {
+    public func filter(_ predicateClosure: (Self.Item.Type) -> NSPredicate) -> Self {
         return self.filter(using: predicateClosure(Self.Item.self))
     }
     
@@ -40,7 +40,7 @@ extension GenericQueryable {
 
 extension GenericQueryable {
     
-    public func count(@noescape predicateClosure: (Self.Item.Type) -> NSPredicate) -> Int {
+    public func count(_ predicateClosure: (Self.Item.Type) -> NSPredicate) -> Int {
         return self.filter(using: predicateClosure(Self.Item.self)).count()
     }
     
@@ -48,11 +48,11 @@ extension GenericQueryable {
 
 extension GenericQueryable {
     
-    public func any(@noescape predicateClosure: (Self.Item.Type) -> NSPredicate) -> Bool {
+    public func any(_ predicateClosure: (Self.Item.Type) -> NSPredicate) -> Bool {
         return self.filter(using: predicateClosure(Self.Item.self)).any()
     }
     
-    public func none(@noescape predicateClosure: (Self.Item.Type) -> NSPredicate) -> Bool {
+    public func none(_ predicateClosure: (Self.Item.Type) -> NSPredicate) -> Bool {
         return self.filter(using: predicateClosure(Self.Item.self)).none()
     }
     
@@ -60,7 +60,7 @@ extension GenericQueryable {
 
 extension GenericQueryable {
     
-    public func first(@noescape predicateClosure: (Self.Item.Type) -> NSPredicate) -> Self.Item? {
+    public func first(_ predicateClosure: (Self.Item.Type) -> NSPredicate) -> Self.Item? {
         return self.filter(using: predicateClosure(Self.Item.self)).first()
     }
     
@@ -90,33 +90,33 @@ extension GenericQueryable {
 //    
 //}
 
-extension Table: SequenceType {
+extension Table: Sequence {
 
-    public typealias Generator = AnyGenerator<T>
+    public typealias Iterator = AnyIterator<T>
 
-    public func generate() -> Generator {
-        return AnyGenerator(self.toArray().generate())
+    public func makeIterator() -> Iterator {
+        return AnyIterator(self.toArray().makeIterator())
     }
     
     // turns the SequenceType implementation unavailable
     @available(*, unavailable)
-    public func filter(@noescape includeElement: (Table.Generator.Element) throws -> Bool) rethrows -> [Table.Generator.Element] {
+    public func filter(includeElement: (Table.Iterator.Element) throws -> Bool) rethrows -> [Table.Iterator.Element] {
         return []
     }
     
 }
 
-extension AttributeQuery: SequenceType {
+extension AttributeQuery: Sequence {
     
-    public typealias Generator = AnyGenerator<T>
+    public typealias Iterator = AnyIterator<T>
     
-    public func generate() -> Generator {
-        return AnyGenerator(self.toArray().generate())
+    public func makeIterator() -> Iterator {
+        return AnyIterator(self.toArray().makeIterator())
     }
 
     // turns the SequenceType implementation unavailable
     @available(*, unavailable)
-    public func filter(@noescape includeElement: (AttributeQuery.Generator.Element) throws -> Bool) rethrows -> [AttributeQuery.Generator.Element] {
+    public func filter(includeElement: (AttributeQuery.Iterator.Element) throws -> Bool) rethrows -> [AttributeQuery.Iterator.Element] {
         return []
     }
 

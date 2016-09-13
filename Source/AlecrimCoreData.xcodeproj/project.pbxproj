@@ -24,7 +24,6 @@
 		14CB032B1B7795E700EB87B8 /* Table.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D972B1B5DA55C00995795 /* Table.swift */; };
 		14CB032C1B7795ED00EB87B8 /* AttributeQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FBAD691B76AF2100EB662A /* AttributeQuery.swift */; };
 		14CB032F1B7795F600EB87B8 /* DataContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D971F1B5DA55C00995795 /* DataContext.swift */; };
-		14CB03301B7795F600EB87B8 /* ALCFetchedResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1468BE271B6581F700547C54 /* ALCFetchedResultsController.swift */; };
 		14CB03311B7795F600EB87B8 /* FetchRequestController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141242541B6461F700FFC670 /* FetchRequestController.swift */; };
 		14CB03321B7795F600EB87B8 /* FetchRequestControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D565AC1B64B07E00B1EFF1 /* FetchRequestControllerDelegate.swift */; };
 		14CB03331B77960300EB87B8 /* NSArrayControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A501771B6737560057DD8B /* NSArrayControllerExtensions.swift */; };
@@ -51,7 +50,6 @@
 		145D97281B5DA55C00995795 /* TableProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableProtocol.swift; sourceTree = "<group>"; };
 		145D972A1B5DA55C00995795 /* Attribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Attribute.swift; sourceTree = "<group>"; };
 		145D972B1B5DA55C00995795 /* Table.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Table.swift; sourceTree = "<group>"; };
-		1468BE271B6581F700547C54 /* ALCFetchedResultsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ALCFetchedResultsController.swift; sourceTree = "<group>"; };
 		148C17411B76B5980011BD00 /* AttributeQueryProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributeQueryProtocol.swift; sourceTree = "<group>"; };
 		14A5016F1B671A400057DD8B /* NSManagedObjectContextExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSManagedObjectContextExtensions.swift; sourceTree = "<group>"; };
 		14A501711B6732820057DD8B /* UITableViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewExtensions.swift; sourceTree = "<group>"; };
@@ -125,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				145D971F1B5DA55C00995795 /* DataContext.swift */,
-				1468BE271B6581F700547C54 /* ALCFetchedResultsController.swift */,
 				141242541B6461F700FFC670 /* FetchRequestController.swift */,
 				14D565AC1B64B07E00B1EFF1 /* FetchRequestControllerDelegate.swift */,
 			);
@@ -290,7 +287,6 @@
 				14CB031F1B7790E900EB87B8 /* GenericQueryable.swift in Sources */,
 				14CB03211B77916700EB87B8 /* TableProtocol.swift in Sources */,
 				14CB032B1B7795E700EB87B8 /* Table.swift in Sources */,
-				14CB03301B7795F600EB87B8 /* ALCFetchedResultsController.swift in Sources */,
 				14CB03341B77960300EB87B8 /* NSCollectionViewExtensions.swift in Sources */,
 				14CB03381B77960800EB87B8 /* UICollectionViewExtensions.swift in Sources */,
 				14CB03331B77960300EB87B8 /* NSArrayControllerExtensions.swift in Sources */,
@@ -346,13 +342,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VALID_ARCHS = "x86_64 arm64 armv7 armv7s armv7k";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -395,12 +390,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VALID_ARCHS = "x86_64 arm64 armv7 armv7s armv7k";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -424,12 +418,10 @@
 				INFOPLIST_FILE = AlecrimCoreData/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alecrim.AlecrimCoreData;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -448,11 +440,10 @@
 				INFOPLIST_FILE = AlecrimCoreData/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alecrim.AlecrimCoreData;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

@@ -11,12 +11,14 @@ import CoreData
 
 public protocol CoreDataQueryable: GenericQueryable {
     
+    associatedtype Item: NSFetchRequestResult
+    
     var batchSize: Int { get set }
 
     var dataContext: NSManagedObjectContext { get }
     var entityDescription: NSEntityDescription { get }
 
-    func toFetchRequest() -> NSFetchRequest
+    func toFetchRequest<ResultType: NSFetchRequestResult>() -> NSFetchRequest<ResultType>
     
 }
 
@@ -26,7 +28,7 @@ extension CoreDataQueryable {
     
     public func count() -> Int {
         do {
-            let c = try self.dataContext.countForFetchRequest(self.toFetchRequest())
+            let c = try self.dataContext.count(for: self.toFetchRequest())
             
             if c != NSNotFound {
                 return c
@@ -47,33 +49,33 @@ extension CoreDataQueryable {
 
 extension CoreDataQueryable {
     
-    public func sum<U>(@noescape closure: (Self.Item.Type) -> Attribute<U>) -> U {
+    public func sum<U>(_ closure: (Self.Item.Type) -> Attribute<U>) -> U {
         let attribute = closure(Self.Item.self)
         return self.aggregate(using: "sum", attribute: attribute)
     }
     
-    public func min<U>(@noescape closure: (Self.Item.Type) -> Attribute<U>) -> U {
+    public func min<U>(_ closure: (Self.Item.Type) -> Attribute<U>) -> U {
         let attribute = closure(Self.Item.self)
         return self.aggregate(using: "min", attribute: attribute)
     }
     
-    public func max<U>(@noescape closure: (Self.Item.Type) -> Attribute<U>) -> U {
+    public func max<U>(_ closure: (Self.Item.Type) -> Attribute<U>) -> U {
         let attribute = closure(Self.Item.self)
         return self.aggregate(using: "max", attribute: attribute)
     }
 
     // same as average, for convenience
-    public func avg<U>(@noescape closure: (Self.Item.Type) -> Attribute<U>) -> U {
+    public func avg<U>(_ closure: (Self.Item.Type) -> Attribute<U>) -> U {
         let attribute = closure(Self.Item.self)
         return self.aggregate(using: "average", attribute: attribute)
     }
 
-    public func average<U>(@noescape closure: (Self.Item.Type) -> Attribute<U>) -> U {
+    public func average<U>(_ closure: (Self.Item.Type) -> Attribute<U>) -> U {
         let attribute = closure(Self.Item.self)
         return self.aggregate(using: "average", attribute: attribute)
     }
     
-    private func aggregate<U>(using functionName: String, attribute: Attribute<U>) -> U {
+    fileprivate func aggregate<U>(using functionName: String, attribute: Attribute<U>) -> U {
         let attributeDescription = self.entityDescription.attributesByName[attribute.___name]!
         
         let keyPathExpression = NSExpression(forKeyPath: attribute.___name)
@@ -84,15 +86,15 @@ extension CoreDataQueryable {
         expressionDescription.expression = functionExpression
         expressionDescription.expressionResultType = attributeDescription.attributeType
         
-        let fetchRequest = self.toFetchRequest()
+        let fetchRequest: NSFetchRequest<NSDictionary> = self.toFetchRequest()
         fetchRequest.propertiesToFetch =  [expressionDescription]
-        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.resultType = NSFetchRequestResultType.dictionaryResultType
         
         do {
-            let results = try self.dataContext.executeFetchRequest(fetchRequest)
+            let results = try self.dataContext.fetch(fetchRequest)
             
-            guard let firstResult = results.first as? NSDictionary else { throw AlecrimCoreDataError.unexpectedValue(results) }
-            guard let anyObjectValue = firstResult.valueForKey(expressionDescription.name) else { throw AlecrimCoreDataError.unexpectedValue(firstResult) }
+            guard let firstResult = results.first else { throw AlecrimCoreDataError.unexpectedValue(results) }
+            guard let anyObjectValue = firstResult.value(forKey: expressionDescription.name) else { throw AlecrimCoreDataError.unexpectedValue(firstResult) }
             guard let value = anyObjectValue as? U else { throw AlecrimCoreDataError.unexpectedValue(anyObjectValue) }
             
             return value

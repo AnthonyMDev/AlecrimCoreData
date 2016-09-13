@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-public struct AttributeQuery<T>: AttributeQueryProtocol {
+public struct AttributeQuery<T: NSDictionary>: AttributeQueryProtocol {
     
     public typealias Item = T
     
@@ -26,7 +26,7 @@ public struct AttributeQuery<T>: AttributeQueryProtocol {
     public var returnsDistinctResults = false
     public var propertiesToFetch = [String]()
     
-    private init(dataContext: NSManagedObjectContext, entityDescription: NSEntityDescription, offset: Int, limit: Int, batchSize: Int, predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?) {
+    fileprivate init(dataContext: NSManagedObjectContext, entityDescription: NSEntityDescription, offset: Int, limit: Int, batchSize: Int, predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?) {
         self.dataContext = dataContext
         self.entityDescription = entityDescription
         
@@ -44,7 +44,7 @@ public struct AttributeQuery<T>: AttributeQueryProtocol {
 extension Table {
     
     // one attribute
-    public func select<P, A: AttributeProtocol where A.ValueType == P>(@noescape closure: (Item.Type) -> A) -> AttributeQuery<P> {
+    public func select<P, A: AttributeProtocol>(_ closure: (Item.Type) -> A) -> AttributeQuery<P> where A.ValueType == P {
         var attributeQuery = AttributeQuery<P>(
             dataContext: self.dataContext,
             entityDescription: self.entityDescription,
@@ -61,7 +61,7 @@ extension Table {
     }
 
     // more than one attribute
-    public func select(propertiesToFetch: [String]) -> AttributeQuery<NSDictionary> {
+    public func select(_ propertiesToFetch: [String]) -> AttributeQuery<NSDictionary> {
         var attributeQuery = AttributeQuery<NSDictionary>(
             dataContext: self.dataContext,
             entityDescription: self.entityDescription,

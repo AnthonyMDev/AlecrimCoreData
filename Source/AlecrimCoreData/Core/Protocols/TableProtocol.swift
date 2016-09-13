@@ -20,15 +20,15 @@ public protocol TableProtocol: CoreDataQueryable {
 extension TableProtocol {
     
     public func createEntity() -> Self.Item {
-        return Self.Item(entity: self.entityDescription, insertIntoManagedObjectContext: self.dataContext)
+        return Self.Item(entity: self.entityDescription, insertInto: self.dataContext)
     }
 
-    public func deleteEntity(entity: Self.Item) {
-        self.dataContext.deleteObject(entity)
+    public func deleteEntity(_ entity: Self.Item) {
+        self.dataContext.delete(entity)
     }
     
-    public func refreshEntity(entity: Self.Item, mergingChanges mergeChanges: Bool = true) {
-        self.dataContext.refreshObject(entity, mergeChanges: mergeChanges)
+    public func refreshEntity(_ entity: Self.Item, mergingChanges mergeChanges: Bool = true) {
+        self.dataContext.refresh(entity, mergeChanges: mergeChanges)
     }
 
 }
@@ -36,14 +36,14 @@ extension TableProtocol {
 extension TableProtocol {
     
     public func deleteEntities() {
-        let fetchRequest = self.toFetchRequest()
-        fetchRequest.resultType = .ManagedObjectIDResultType
+        let fetchRequest: NSFetchRequest<NSManagedObjectID> = self.toFetchRequest()
+        fetchRequest.resultType = .managedObjectIDResultType
         
-        let objectIDs = try! self.dataContext.executeFetchRequest(fetchRequest) as! [NSManagedObjectID]
+        let objectIDs = try! self.dataContext.fetch(fetchRequest)
         
         for objectID in objectIDs {
-            let object = try! self.dataContext.existingObjectWithID(objectID)
-            self.dataContext.deleteObject(object)
+            let object = try! self.dataContext.existingObject(with: objectID)
+            self.dataContext.delete(object)
         }
     }
 
@@ -51,7 +51,7 @@ extension TableProtocol {
 
 extension TableProtocol {
     
-    public func firstOrCreated(@noescape predicateClosure: (Self.Item.Type) -> NSComparisonPredicate) -> Self.Item {
+    public func firstOrCreated(_ predicateClosure: (Self.Item.Type) -> NSComparisonPredicate) -> Self.Item {
         let predicate = predicateClosure(Self.Item.self)
         
         if let entity = self.filter(using: predicate).first() {
@@ -61,7 +61,7 @@ extension TableProtocol {
             let entity = self.createEntity()
             
             let attributeName = predicate.leftExpression.keyPath
-            let value: AnyObject = predicate.rightExpression.constantValue!
+            let value: AnyObject = predicate.rightExpression.constantValue! as AnyObject
             
             (entity as NSManagedObject).setValue(value, forKey: attributeName)
             
@@ -80,7 +80,7 @@ extension TableProtocol {
         do {
             var results: [Self.Item] = []
             
-            let objects = try self.dataContext.executeFetchRequest(self.toFetchRequest())
+            let objects = try self.dataContext.fetch(self.toFetchRequest())
             
             if let entities = objects as? [Self.Item] {
                 results += entities
@@ -106,8 +106,8 @@ extension TableProtocol {
 
 extension TableProtocol {
     
-    public func toFetchRequest() -> NSFetchRequest {
-        let fetchRequest = NSFetchRequest()
+    public final func toFetchRequest<ResultType: NSFetchRequestResult>() -> NSFetchRequest<ResultType> {
+        let fetchRequest = NSFetchRequest<ResultType>()
         
         fetchRequest.entity = self.entityDescription
         
